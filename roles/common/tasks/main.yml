@@ -49,6 +49,19 @@
     daemon_reload: yes
     name: docker
 
+- name: Configure containerd with defaults and local imports
+  copy:
+    dest: /etc/containerd/config.toml
+    src: config.toml
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Restart service containerd
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: containerd
 
 - name: Add vagrant user to docker group
   user:
