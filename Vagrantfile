@@ -7,7 +7,7 @@ CPU = 2                             # Number of processors (Minimum value of 2 o
 MASTER_NAME="master"                # Master node name
 WORKER_NBR = 2                      # Number of workers node
 NODE_NETWORK_BASE = "192.168.56"    # First three octets of the IP address that will be assign to all type of nodes
-POD_NETWORK = "10.244.0.0/16"       # Private network for inter-pod communication
+POD_NETWORK = "192.168.100.0/16"    # Private network for inter-pod communication
 
 
 

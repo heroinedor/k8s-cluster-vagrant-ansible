@@ -34,12 +34,18 @@
     url: https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
     dest: /tmp/kube-flannel.yml
 
-- name: Flannel network installation - modify the flannel manifest
+- name: Flannel network installation - specify network interface in the manifest
   become: false
   ansible.builtin.lineinfile:
     path: /tmp/kube-flannel.yml
     insertafter: '- --kube-subnet-mgr'
     line: '        - --iface=eth1'
+
+- name: Flannel network installation - specify podcidr in the manifest
+  ansible.builtin.lineinfile:
+    path: /tmp/kube-flannel.yml
+    regexp: '10\.244\.0\.0'
+    line: '      "Network": "{{ pod_network }}",'
 
 - name: Flannel network installation - run the flannel manifest
   become: false
