@@ -28,9 +28,22 @@
     - cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
     - chown vagrant:vagrant /home/vagrant/.kube/config
 
-- name: Install flannel pod network
+- name: Flannel network installation - download the flannel manifest
   become: false
-  command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+    dest: /tmp/kube-flannel.yml
+
+- name: Flannel network installation - modify the flannel manifest
+  become: false
+  ansible.builtin.lineinfile:
+    path: /tmp/kube-flannel.yml
+    insertafter: '- --kube-subnet-mgr'
+    line: '        - --iface=eth1'
+
+- name: Flannel network installation - run the flannel manifest
+  become: false
+  command: kubectl apply -f /tmp/kube-flannel.yml
 
 - name: Generate join command
   command: kubeadm token create --print-join-command
