@@ -1,12 +1,14 @@
 gpg_keys:
   - key: https://download.docker.com/linux/ubuntu/gpg
   - key: "https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/deb/Release.key"
+  - key: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
 
 k8s_version: 1.29
 
 repositories:
   - repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
   - repo: "deb https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/deb/ /"
+  - repo: "deb https://packages.buildkite.com/helm-linux/helm-debian/any/ any main"
 
 https_packages:
 - name: apt-transport-https
@@ -22,3 +24,4 @@ k8s_packages:
 - name: kubeadm 
 - name: kubelet 
 - name: kubectl
+- name: helm
