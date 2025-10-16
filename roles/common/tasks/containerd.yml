@@ -1,0 +1,10 @@
+- name: remove containerd auto-generated config that prevent kubernetes from starting
+  ansible.builtin.file:
+    path: /etc/containerd/config.toml
+    state: absent
+
+- name: Restart service containerd
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: containerd

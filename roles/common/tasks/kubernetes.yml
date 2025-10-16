@@ -1,0 +1,18 @@
+- name: Install Kubernetes binaries
+  apt:
+    name="{{ item.name }}"
+    state=present
+    update_cache=yes
+  with_items: "{{ k8s_packages | default([]) }}"
+
+- name: Create a directory for kubelet configuration
+  ansible.builtin.file:
+    path: /etc/systemd/system/kubelet.service.d/
+    state: directory
+
+- name: Configure node ip
+  ansible.builtin.template:
+    src: common/files/local-overrides.conf.j2
+    dest: /etc/systemd/system/kubelet.service.d/local-overrides.conf
+  notify:
+    - restart kubelet

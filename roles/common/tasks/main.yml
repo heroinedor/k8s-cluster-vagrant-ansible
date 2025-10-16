@@ -1,92 +1,15 @@
-- name: Install packages that allow apt to be used over HTTPS
-  apt: 
-    name='{{ item.name }}'
-    state=present
-    update_cache=yes
-  with_items: "{{ https_packages | default([]) }}"
+- name: Include apt related tasks
+  ansible.builtin.include_tasks:
+    file: apt.yml
 
+- name: Include docker related tasks
+  ansible.builtin.include_tasks:
+    file: docker.yml
 
-- name: Add new repositories keys
-  apt_key:
-    url='{{item.key}}'
-    state=present
-  with_items: "{{ gpg_keys | default([]) }}"
+- name: Include containerd related tasks
+  ansible.builtin.include_tasks:
+    file: containerd.yml
 
-
-- name: Add new apt repositories
-  apt_repository:
-    repo='{{item.repo}}'
-    state=present
-  with_items: "{{ repositories | default([]) }}"
-
-
-- name: Install docker
-  apt: 
-    name="{{ item.name }}"
-    state=present
-    update_cache=yes
-  with_items: "{{ docker_packages | default([]) }}"
-  notify:
-    - docker status
-
-- name: Change Docker cgroup driver
-  ansible.builtin.template:
-    src: common/files/docker-daemon.json
-    dest: /etc/docker/daemon.json
-
-- name: Restart service docker
-  systemd:
-    state: restarted
-    daemon_reload: yes
-    name: docker
-
-
-- name: Add vagrant user to docker group
-  user:
-    name: vagrant
-    group: docker
-
-
-- name: Remove swapfile from /etc/fstab
-  mount:
-    name: "{{ item }}"
-    fstype: swap
-    state: absent
-  with_items:
-    - swap
-    - none
-
-
-- name: Disable swap
-  command: swapoff -a
-  when: ansible_swaptotal_mb > 0
-
-
-- name: Install Kubernetes binaries
-  apt: 
-    name="{{ item.name }}"
-    state=present
-    update_cache=yes
-  with_items: "{{ k8s_packages | default([]) }}"
-
-- name: Create a directory for kubelet configuration
-  ansible.builtin.file:
-    path: /etc/systemd/system/kubelet.service.d/
-    state: directory
-
-- name: Configure node ip
-  ansible.builtin.template:
-    src: common/files/local-overrides.conf.j2
-    dest: /etc/systemd/system/kubelet.service.d/local-overrides.conf
-  notify:
-    - restart kubelet
-
-#- name: Configure node ip
-#  lineinfile:
-#    path: '/usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf'
-#    line: 'Environment="KUBELET_EXTRA_ARGS=--node-ip={{ node_ip }}"'
-#    regexp: 'KUBELET_EXTRA_ARGS='
-#    insertafter: '\[Service\]'
-#    state: present
-#  notify:
-#    - restart kubelet
+- name: Include kubernetes related tasks
+  ansible.builtin.include_tasks:
+    file: kubernetes.yml

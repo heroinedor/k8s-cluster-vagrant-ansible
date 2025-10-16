@@ -1,0 +1,40 @@
+- name: Install docker
+  apt:
+    name="{{ item.name }}"
+    state=present
+    update_cache=yes
+  with_items: "{{ docker_packages | default([]) }}"
+  notify:
+    - docker status
+
+- name: Change Docker cgroup driver
+  ansible.builtin.template:
+    src: common/files/docker-daemon.json
+    dest: /etc/docker/daemon.json
+
+- name: Restart service docker
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: docker
+
+
+- name: Add vagrant user to docker group
+  user:
+    name: vagrant
+    group: docker
+
+
+- name: Remove swapfile from /etc/fstab
+  mount:
+    name: "{{ item }}"
+    fstype: swap
+    state: absent
+  with_items:
+    - swap
+    - none
+
+
+- name: Disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
