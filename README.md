@@ -25,7 +25,7 @@ scp -r vagrant@192.168.50.10:/home/vagrant/.kube $HOME/
 password = vagrant
 ```
 
-Test your config like the example bellow :
+Test your config like the example below :
 
 ```sh
 kubectl get nodes
